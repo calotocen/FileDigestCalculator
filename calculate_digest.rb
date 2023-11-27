@@ -25,7 +25,7 @@ ARGV.each do |root_path|
     if FileTest.file?(root_path)
         write_row.call(root_path)
     elsif FileTest.directory?(root_path) && option[:recursive]
-        Dir.glob(Pathname(root_path).join("**/*").to_s) do |path|
+        Pathname(root_path).glob('**/*') do |path|
             write_row.call(path) if FileTest.file?(path)
         end
     end
