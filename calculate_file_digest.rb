@@ -17,7 +17,7 @@ option_parser.parse!(ARGV)
 
 csv_options = {
     write_headers: true,
-    headers: ['Path', 'File Name', 'SHA-256', 'Created Time', 'Modified Time', 'Access Time', 'Change Time'],
+    headers: ['path', 'file_name', 'sha256', 'created_time', 'modified_time', 'access_time', 'change_time'],
 }
 csv_writer = option[:output].nil? ? CSV.new($stdout, **csv_options) : CSV.open(option[:output], 'wb', **csv_options)
 write_row = ->(path) do
