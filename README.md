@@ -32,6 +32,14 @@ $ ruby find_duplicate_file.rb -k 'file_name' -k sha256 -o duplicate_files.json d
 $
 ```
 
+### Delete duplicate file
+`delete_duplicate_file.rb` delete duplicate files. The following command line will delete second and subsequent files in each element in `duplicate_files.json`.
+```
+$ ruby calculate_file_digest.rb duplicate_files.json
+
+$
+```
+
 ## Repository information
 Author: calotocen  
 URL: https://github.com/calotocen/FileDigestCalculator
