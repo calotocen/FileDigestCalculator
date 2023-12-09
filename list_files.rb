@@ -9,7 +9,7 @@ option_parser = OptionParser.new do |op|
     op.on('-o PATH', '--output', 'output file path for digests') do |v|
         option[:output] = v
     end
-    op.on('-r', '--recursive', 'calculate all files in directories') do |v|
+    op.on('-r', '--recursive', 'list all files in directories') do |v|
         option[:recursive] = v
     end
 end
