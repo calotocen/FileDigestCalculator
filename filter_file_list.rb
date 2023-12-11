@@ -29,14 +29,7 @@ end
 duplicate_files = table
     .group_by{|row| option[:key].size == 1 ? row[option[:key][0]] : option[:key].map{|key| row[key]}}
     .select{|sha256, rows| rows.size >= 2}
-    .map{|sha256, rows| [sha256, rows.map{|row| row[:path]}]}
-    .to_h
 
-output_data = JSON.generate({keys: option[:key], duplicate_files: duplicate_files})
-if option[:output].nil?
-    print(output_data)
-else
-    File.open(option[:output], 'w') do |file_handle|
-        file_handle.puts(output_data)
-    end
-end
+writer = option[:output].nil? ? $stdout : File.open(option[:output], 'w')
+writer << CSV::Table.new(duplicate_files.values.flatten(1)).to_csv
+writer.close unless option[:output].nil?
