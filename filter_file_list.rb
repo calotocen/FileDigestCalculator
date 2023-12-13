@@ -6,6 +6,7 @@ option = {
     group_by: [],
     include: [],
     exclude: [],
+    sort_by: [],
 }
 option_parser = OptionParser.new do |op|
     op.banner = "Usage: #{$0} [options] [csv file...]"
@@ -17,6 +18,9 @@ option_parser = OptionParser.new do |op|
     end
     op.on('-e CONDITION', '--exclude') do |v|
         option[:exclude] << v
+    end
+    op.on('-s COLUMN_NAME', '--sort_by') do |v|
+        option[:sort_by] << v.intern
     end
     op.on('-o PATH', '--output', 'output file path for digests') do |v|
         option[:output] = v
@@ -49,6 +53,10 @@ filters = {
 end
 
 output_file_list.flatten!(1)
+unless option[:sort_by].empty?
+    sequential_number_for_stable_sort = 0
+    output_file_list.sort_by! {|row| option[:sort_by].map{|column_name| row[column_name]} << (sequential_number_for_stable_sort += 1)}
+end
 writer = option[:output].nil? ? $stdout : File.open(option[:output], 'w')
 writer << CSV::Table.new(output_file_list).to_csv
 writer.close unless option[:output].nil?
