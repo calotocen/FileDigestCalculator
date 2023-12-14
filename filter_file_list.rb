@@ -38,16 +38,16 @@ ARGV.each do |csv_path|
 end
 
 output_file_list = input_file_list.group_by{|row| option[:group_by].map{|column_name| row[column_name]}}.values
-filters = {
-    'count' => ->(rows, expression) { eval("#{rows.length}#{expression}") },
+mappers = {
+    'count' => ->(rows, expression) {eval("#{rows.length}#{expression}") ? rows : []},
 }
 [:include, :exclude].each do |option_name|
     option[option_name].each do |condition|
         raise ArgumentError.new("unkonwn filter: condition='#{condition}'") unless /^(?<filter_name>[[:alnum:]]+)(:(?<parameters>.*))?$/ =~ condition
-        raise ArgumentError.new("unkonwn filter: filter_name='#{filter_name}', condition='#{condition}'") unless filters.has_key?(filter_name)
-        output_file_list.filter! do |rows|
-            result = filters[filter_name].call(rows, parameters)
-            option_name == :include ? result : !result
+        raise ArgumentError.new("unkonwn filter: filter_name='#{filter_name}', condition='#{condition}'") unless mappers.has_key?(filter_name)
+        output_file_list.map! do |rows|
+            mapped_rows = mappers[filter_name].call(rows, parameters)
+            option_name == :include ? mapped_rows : rows - mapped_rows
         end
     end
 end
