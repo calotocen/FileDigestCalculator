@@ -30,10 +30,10 @@ write_row = ->(path) do
     csv_writer << [File.expand_path(path),
                    File.basename(path),
                    Digest::SHA256.file(path).hexdigest,
-                   birth_time,
-                   file_stat.mtime,
-                   file_stat.atime,
-                   file_stat.ctime]
+                   birth_time.strftime('%Y-%m-%dT%H:%M:%S%z'),
+                   file_stat.mtime.strftime('%Y-%m-%dT%H:%M:%S%z'),
+                   file_stat.atime.strftime('%Y-%m-%dT%H:%M:%S%z'),
+                   file_stat.ctime.strftime('%Y-%m-%dT%H:%M:%S%z')]
 end
 ARGV.each do |root_path|
     if FileTest.file?(root_path)
