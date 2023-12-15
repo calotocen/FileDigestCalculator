@@ -40,6 +40,7 @@ end
 output_file_list = input_file_list.group_by{|row| option[:group_by].map{|column_name| row[column_name]}}.values
 mappers = {
     'count' => ->(rows, expression) {eval("#{rows.length}#{expression}") ? rows : []},
+    'path' => ->(rows, regex_pattern) {rows.filter {|row| /#{regex_pattern}/ =~ row[:path]}},
 }
 [:include, :exclude].each do |option_name|
     option[option_name].each do |condition|
