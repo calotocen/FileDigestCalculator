@@ -11,7 +11,7 @@ option = {
 option_parser = OptionParser.new do |op|
     op.banner = "Usage: #{$0} [options] [csv file...]"
     op.on('-g COLUMN_NAME', '--group-by') do |v|
-        option[:group_by] << v.intern
+        option[:group_by] << v
     end
     op.on('-i CONDITION', '--include') do |v|
         option[:include] << v
@@ -20,7 +20,7 @@ option_parser = OptionParser.new do |op|
         option[:exclude] << v
     end
     op.on('-s COLUMN_NAME', '--sort_by') do |v|
-        option[:sort_by] << v.intern
+        option[:sort_by] << v
     end
     op.on('-o PATH', '--output', 'output file path for digests') do |v|
         option[:output] = v
@@ -28,14 +28,8 @@ option_parser = OptionParser.new do |op|
 end
 option_parser.parse!(ARGV)
 
-exit(0) if ARGV.empty?
-
-input_file_list = CSV.table(ARGV.shift)
-ARGV.each do |csv_path|
-    CSV.table(csv_path).each do |row|
-        input_file_list << row
-    end
-end
+input_rows = ARGV.map{|csv_path| CSV.open(csv_path, headers: true).to_a}.flatten(1)
+input_file_list = CVA::Table.new(input_file_list)
 
 output_file_list = input_file_list.group_by{|row| option[:group_by].map{|column_name| row[column_name]}}.values
 mappers = {
