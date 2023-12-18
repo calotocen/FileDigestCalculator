@@ -28,7 +28,7 @@ option_parser = OptionParser.new do |op|
 end
 option_parser.parse!(ARGV)
 
-input_rows = ARGV.map{|csv_path| CSV.open(csv_path, headers: true).to_a}.flatten(1)
+input_rows = ARGV.map{|csv_path| CSV.open(csv_path, converters: :all, headers: true).to_a}.flatten(1)
 input_file_list = CVA::Table.new(input_file_list)
 
 output_file_list = input_file_list.group_by{|row| option[:group_by].map{|column_name| row[column_name]}}.values
