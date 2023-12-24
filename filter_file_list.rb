@@ -36,6 +36,31 @@ option[:filter].map do |filter|
             method = eval(value).method(operator.intern)
             ->(rows) {rows.filter {|row| method[row[name.intern]]}}
         },
+        'created_time' => ->(name, operator, value) {
+            if /^(?<method_name>min|max)\((?<parameters>[[:print:]]+)\)$/ =~ value
+                ->(rows) {
+                    return [] if rows.empty?
+                    # the operator must be reversed to swap the left and right operands.
+                    method = rows.map{|row| row[parameters]}.method(method_name)[].method(operator.tr('<>', '><').intern)
+                    rows.filter {|row| method[row[name]]}
+                }
+            else
+                ->(rows) {
+                    # the operator must be reversed to swap the left and right operands.
+                    method = DateTime.parse(value).method(operator.tr('<>', '><').intern)
+                    rows.filter {|row| method[row[name]]}
+                }
+            end
+        },
+        'modified_time' => ->(name, operator, value) {
+            return mapper_factories['created_time'][name, operator, value]
+        },
+        'access_time' => ->(name, operator, value) {
+            return mapper_factories['created_time'][name, operator, value]
+        },
+        'change_time' => ->(name, operator, value) {
+            return mapper_factories['created_time'][name, operator, value]
+        },
     }
     # Ruby cannot assign matched strings to local variables by (?<>) when patterns contain expression expansion by #{}.
     unless m = /^(#{mapper_factories.keys.join('|')})\s*(?:(==|!=|<=?|>=?|=~|!~)\s*(.*))?$/.match(filter)
