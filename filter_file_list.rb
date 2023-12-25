@@ -32,6 +32,14 @@ option[:filter].map do |filter|
             method = value.to_i.method(operator.tr('<>', '><').intern)
             ->(rows) {method[rows.length] ? rows : []}
         },
+        'index' => ->(name, operator, value) {
+            # the operator must be reversed to swap the left and right operands.
+            method = value.to_i.method(operator.tr('<>', '><').intern)
+            ->(rows) {
+                index = -1
+                rows.filter {method[index += 1]}
+            }
+        },
         'path' => ->(name, operator, value) {
             method = eval(value).method(operator.intern)
             ->(rows) {rows.filter {|row| method[row[name.intern]]}}
