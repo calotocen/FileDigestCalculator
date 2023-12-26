@@ -41,8 +41,9 @@ option[:filter].map do |filter|
             }
         },
         'path' => ->(name, operator, value) {
-            method = eval(value).method(operator.intern)
-            ->(rows) {rows.filter {|row| method[row[name.intern]]}}
+            # the operator must be reversed to swap the left and right operands.
+            method = eval(value).method(operator.tr('<>', '><').intern)
+            ->(rows) {rows.filter {|row| method[row[name]]}}
         },
         'created_time' => ->(name, operator, value) {
             if /^(?<method_name>min|max)\((?<parameters>[[:print:]]+)\)$/ =~ value
