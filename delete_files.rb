@@ -15,7 +15,7 @@ ARGV.each do |csv_path|
         path = row['path']
         begin
             File.delete(path)
-            puts('delete #{path} ... done') if option[:verbose]
+            puts("delete #{path} ... done") if option[:verbose]
         rescue Errno::ENOENT
             STDERR.puts("delete #{path} ... warning: #{$!}")
         end
