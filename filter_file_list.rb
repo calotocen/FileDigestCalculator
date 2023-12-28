@@ -6,6 +6,7 @@ option = {
     group_by: [],
     filter: [],
     sort_by: [],
+    column: [],
 }
 option_parser = OptionParser.new do |op|
     op.banner = "Usage: #{$0} [options] [csv file...]"
@@ -17,6 +18,9 @@ option_parser = OptionParser.new do |op|
     end
     op.on('-s COLUMN_NAME', '--sort_by') do |v|
         option[:sort_by] << v
+    end
+    op.on('-c COLUMN_NAME', '--column') do |v|
+        option[:column] << v
     end
     op.on('-o PATH', '--output', 'output file path for digests') do |v|
         option[:output] = v
@@ -92,6 +96,11 @@ unless option[:sort_by].empty?
         option[:sort_by]
             .map {|column_name| row[column_name]}
             .append(sequential_number_for_stable_sort += 1)
+    end
+end
+unless option[:column].empty?
+    filtered_rows.map! do |row|
+        row.delete_if {|header, field| !option[:column].include?(header)}
     end
 end
 
