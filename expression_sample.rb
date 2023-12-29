@@ -22,21 +22,23 @@ class ExpressionParser < Parslet::Parser
     end
 end
 
-IntegralLiteral = Struct.new(:integral_literal) do
-    def eval
-        integral_literal.to_i
-    end
-end
-StringLiteral = Struct.new(:string_literal) do
-    def eval
-        string_literal.to_s
-    end
-end
 class ExpressionTransform < Parslet::Transform
+    IntegralLiteral = Struct.new(:integral_literal) do
+        def eval
+            integral_literal.to_i
+        end
+    end
+    private_constant :IntegralLiteral
     rule(integral_literal: simple(:integral_literal)) do
         IntegralLiteral.new(integral_literal)
     end
 
+    StringLiteral = Struct.new(:string_literal) do
+        def eval
+            string_literal.to_s
+        end
+    end
+    private_constant :StringLiteral
     rule(string_literal: simple(:string_literal)) do
         StringLiteral.new(string_literal)
     end
