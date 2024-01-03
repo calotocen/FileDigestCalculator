@@ -1,4 +1,5 @@
 require 'csv'
+require 'fileutils'
 require 'logger'
 require 'optparse'
 
@@ -43,7 +44,7 @@ ARGV.each do |csv_path|
         end
         if File.exist?(dst_path)
             logger.warn("The file already exists: path=\"#{dst_path}\"")
-            continue
+            next
         end
 
         dst_dirpath = File.dirname(dst_path)
@@ -55,7 +56,7 @@ ARGV.each do |csv_path|
 
             FileUtils.move(src_path, dst_path)
             logger.info("moved the file: src=\"#{src_path}\", dst=\"#{dst_path}")
-        raise
+        rescue
             logger.fatal("a fatal error occurred: src_path=\"#{src_path}\", dst_path=\"#{dst_path}\", dst_dirpath=\"#{dst_dirpath}\", message=\"#{$!}\"")
             raise
         end
