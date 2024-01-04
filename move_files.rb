@@ -50,7 +50,7 @@ ARGV.each do |csv_path|
         dst_dirpath = File.dirname(dst_path)
         begin
             unless Dir.exist?(dst_dirpath)
-                Dir.mkdir(dst_dirpath)
+                FileUtils.mkdir_p(dst_dirpath)
                 logger.info("create the directory: path=\"#{dst_dirpath}\"")
             end
 
