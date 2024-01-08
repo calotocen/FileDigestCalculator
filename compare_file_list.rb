@@ -2,8 +2,8 @@ require 'csv'
 require 'json'
 require 'optparse'
 
-    option = {}
-    option_parser = OptionParser.new do |op|
+option = {}
+option_parser = OptionParser.new do |op|
     op.banner = "Usage: #{$0} [options] [csv file...]"
     op.on('-o PATH', '--output', 'output file path for digests') do |v|
         option[:output] = v
@@ -31,7 +31,7 @@ end
 
 rows_list = ARGV.map {|csv_path| CSV.open(csv_path, converters: :all, headers: true).to_a}
 rows_list.flatten(1).each {|row|
-row['comparison_result'] = 'Both'
+    row['comparison_result'] = 'Both'
 }
 comparable_rows_list = rows_list.map {|rows| rows.map.with_index {|row, index| ComparableRow.new(row, index)}}
 left_only_rows = comparable_rows_list[0] - comparable_rows_list[1]
