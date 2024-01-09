@@ -50,6 +50,6 @@ csv_options = {
 }
 csv_writer = option[:output].nil? ? CSV.new($stdout, **csv_options) : CSV.open(option[:output], 'wb', **csv_options)
 rows_list.flatten(1).each do |row|
-    csv_writer << row.fields
+    csv_writer << row
 end
 csv_writer.close unless option[:output].nil?
