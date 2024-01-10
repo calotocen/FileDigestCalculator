@@ -19,7 +19,7 @@ csv_options = {
     write_headers: true,
     headers: ['path', 'file_name', 'sha256', 'created_time', 'modified_time', 'access_time', 'change_time'],
 }
-csv_writer = option[:output].nil? ? CSV.new($stdout, **csv_options) : CSV.open(option[:output], 'wb', **csv_options)
+csv_writer = CSV.new(option[:output].nil? ? $stdout.clone : File.open(option[:output], 'wb'), **csv_options)
 write_row = ->(path) do
     file_stat = File.lstat(path)
     begin
@@ -44,4 +44,4 @@ ARGV.each do |root_path|
         end
     end
 end
-csv_writer.close unless option[:output].nil?
+csv_writer.close
