@@ -15,12 +15,8 @@ option_parser = OptionParser.new do |op|
 end
 option_parser.parse!(ARGV)
 
-csv_options = {
-    write_headers: true,
-    headers: ['path', 'file_name', 'sha256', 'created_time', 'modified_time', 'access_time', 'change_time'],
-}
 io = option[:output].nil? ? IO.open($stdout.fileno, 'wb') : File.open(option[:output], 'wb')
-CSV.instance(io, **csv_options)
+CSV.instance(io, write_headers: true, headers: ['path', 'file_name', 'sha256', 'created_time', 'modified_time', 'access_time', 'change_time']) do |csv_writer|
     write_row = ->(path) do
         file_stat = File.lstat(path)
         begin
