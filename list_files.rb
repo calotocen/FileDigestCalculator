@@ -41,6 +41,9 @@ CSV.instance(io, write_headers: true, headers: %w(path file_name sha256 created_
             root_path = arg
             pattern = '**/*'
             logger.debug(%(The path is a directory: path="#{arg}", root_path="#{root_path}", pattern="#{pattern}"))
+        else
+            logger.warn(%(The file does not exist: path="#{arg}"))
+            next
         end
         Pathname(root_path).glob(pattern) do |path|
             file_stat = File.lstat(path)
