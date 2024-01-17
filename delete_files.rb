@@ -45,13 +45,13 @@ CSV.instance(io, write_headers: true, headers: headers) do |csv_writer|
             path = row['path']
             begin
                 File.delete(path)
-                logger.info("deleted a file: path=\"#{path}\"")
+                logger.info(%(deleted a file: path="#{path}"))
                 row['deleted'] = 'Deleted'
             rescue Errno::ENOENT
-                logger.warn("file not found: path=\"#{path}\"")
+                logger.warn(%(file not found: path="#{path}"))
                 row['deleted'] = 'Not found'
             rescue
-                logger.fatal("a fatal error occurred: path=\"#{path}\", message=\"#{$!}\"")
+                logger.warn(%(an error occurred: path="#{path}", message="#{$!}"))
                 raise
             end
             csv_writer << row
