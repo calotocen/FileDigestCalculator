@@ -52,7 +52,7 @@ CSV.instance(io, write_headers: true, headers: headers) do |csv_writer|
                 row['deleted'] = 'Not found'
             rescue
                 logger.warn(%(an error occurred: path="#{path}", message="#{$!}"))
-                raise
+                row['deleted'] = '$!'
             end
             csv_writer << row
         end
