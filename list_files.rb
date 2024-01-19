@@ -36,13 +36,13 @@ CSV.instance(io, write_headers: true, headers: %w(path file_name sha256 created_
         if File.file?(arg)
             root_path = File.dirname(arg)
             pattern = File.basename(arg)
-            logger.debug(%(The path is a normal file: path="#{arg}", root_path="#{root_path}", pattern="#{pattern}"))
+            logger.debug(%(The specified path is a normal file: path="#{arg}", root_path="#{root_path}", pattern="#{pattern}"))
         elsif File.directory?(arg)
             root_path = arg
             pattern = '**/*'
-            logger.debug(%(The path is a directory: path="#{arg}", root_path="#{root_path}", pattern="#{pattern}"))
+            logger.debug(%(The specified path is a directory: path="#{arg}", root_path="#{root_path}", pattern="#{pattern}"))
         else
-            logger.warn(%(The file does not exist: path="#{arg}"))
+            logger.warn(%(The specified path is skipped because it is not files or directories: path="#{arg}"))
             next
         end
         Pathname(root_path).glob(pattern) do |path|
