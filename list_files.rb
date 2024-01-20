@@ -12,7 +12,7 @@ option_parser = OptionParser.new do |op|
     op.banner = "Usage: #{$0} [options] [path...]"
     op.on('--log-file PATH', 'output file path for logging') do |v|
         option[:log_file] = v
-        option[:log_level] = Logger::DEBUG unless option[:log_level].kind_of?(Integer)
+        option[:log_level] = Logger::DEBUG if option[:log_level].kind_of?(Integer)
     end
     op.on('--log-level LEVEL', /unknown|fatal|error|warn|info|debug/i, 'log level') do |v|
         option[:log_level] = v
