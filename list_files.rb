@@ -51,6 +51,11 @@ CSV.instance(io, write_headers: true, headers: %w(path file_name sha256 created_
             next
         end
         Pathname(root_path).glob(pattern) do |path|
+            unless File.file?(path)
+                logger.debug(%(The path is not a normal file: path="#{path}", type="#{File.ftype(path)}"))
+                next
+            end
+
             file_stat = File.lstat(path)
             begin
                 birth_time_as_string = file_stat.birthtime.strftime('%Y-%m-%dT%H:%M:%S%:z')
