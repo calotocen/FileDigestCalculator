@@ -51,26 +51,31 @@ CSV.instance(io, write_headers: true, headers: %w(path file_name sha256 created_
             next
         end
         Pathname(root_path).glob(pattern) do |path|
-            unless File.file?(path)
-                logger.debug(%(The path is not a normal file: path="#{path}", type="#{File.ftype(path)}"))
+            begin
+                unless File.file?(path)
+                    logger.debug(%(The path is not a normal file: path="#{path}", type="#{File.ftype(path)}"))
+                    next
+                end
+
+                file_stat = File.lstat(path)
+                begin
+                    birth_time_as_string = file_stat.birthtime.strftime('%Y-%m-%dT%H:%M:%S%:z')
+                rescue NotImplementedError
+                    birth_time_as_string = 'N/A'
+                end
+                record = [File.expand_path(path),
+                          File.basename(path),
+                          Digest::SHA256.file(path).hexdigest,
+                          birth_time_as_string,
+                          file_stat.mtime.strftime('%Y-%m-%dT%H:%M:%S%:z'),
+                          file_stat.atime.strftime('%Y-%m-%dT%H:%M:%S%:z'),
+                          file_stat.ctime.strftime('%Y-%m-%dT%H:%M:%S%:z')]
+                csv_writer << record
+                logger.debug(%(The file was found: record=#{record}))
+            rescue => exception
+                logger.warn(%(An unexpected warning occurred during getting the file information: path="#{arg}", reason="#{$!}", backtrace=#{exception.backtrace}))
                 next
             end
-
-            file_stat = File.lstat(path)
-            begin
-                birth_time_as_string = file_stat.birthtime.strftime('%Y-%m-%dT%H:%M:%S%:z')
-            rescue NotImplementedError
-                birth_time_as_string = 'N/A'
-            end
-            record = [File.expand_path(path),
-                      File.basename(path),
-                      Digest::SHA256.file(path).hexdigest,
-                      birth_time_as_string,
-                      file_stat.mtime.strftime('%Y-%m-%dT%H:%M:%S%:z'),
-                      file_stat.atime.strftime('%Y-%m-%dT%H:%M:%S%:z'),
-                      file_stat.ctime.strftime('%Y-%m-%dT%H:%M:%S%:z')]
-            csv_writer << record
-            logger.debug(%(The file was found: record=#{record}))
         end
     end
 end
