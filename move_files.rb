@@ -48,7 +48,7 @@ ARGV.each do |csv_path|
             end
         end
         if File.exist?(dst_path)
-            logger.warn("The file already exists: path=\"#{dst_path}\"")
+            logger.warn(%(The file already exists: path="#{dst_path}"))
             next
         end
 
@@ -56,13 +56,13 @@ ARGV.each do |csv_path|
         begin
             unless Dir.exist?(dst_dirpath)
                 FileUtils.mkdir_p(dst_dirpath)
-                logger.info("create the directory: path=\"#{dst_dirpath}\"")
+                logger.info(%(create the directory: path="#{dst_dirpath}"))
             end
 
             FileUtils.move(src_path, dst_path)
-            logger.info("moved the file: src=\"#{src_path}\", dst=\"#{dst_path}")
+            logger.info(%(moved the file: src="#{src_path}", dst="#{dst_path}"))
         rescue
-            logger.fatal("a fatal error occurred: src_path=\"#{src_path}\", dst_path=\"#{dst_path}\", dst_dirpath=\"#{dst_dirpath}\", message=\"#{$!}\"")
+            logger.fatal(%(a fatal error occurred: src_path="#{src_path}", dst_path="#{dst_path}", dst_dirpath="#{dst_dirpath}", message="#{$!}"))
             raise
         end
     end
