@@ -29,6 +29,7 @@ exit 0 if option[:destination].nil?
 logger = Logger.new(option[:log_file])
 logger.level = option[:log_level]
 
+logger.info(%(The script started: script="#{$0}, options=#{option}, args=#{ARGV}"))
 ARGV.each do |csv_path|
     CSV.foreach(csv_path, converters: :all, headers: true) do |row|
         src_path = row['path']
@@ -67,3 +68,4 @@ ARGV.each do |csv_path|
         end
     end
 end
+logger.info(%(The script finished))
