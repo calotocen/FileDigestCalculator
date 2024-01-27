@@ -35,7 +35,7 @@ ARGV.each do |csv_path|
         break
     end
 end
-headers = (headers + ['deleted']).uniq
+headers = [*headers, 'deleted'].uniq
 logger.debug(%(headers for output file: headers=#{headers}))
 
 io = option[:output].nil? ? IO.open($stdout.fileno, 'wb') : File.open(option[:output], 'wb')
