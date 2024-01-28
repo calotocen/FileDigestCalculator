@@ -19,6 +19,9 @@ option_parser = OptionParser.new do |op|
     op.on('--log-level LEVEL', /unknown|fatal|error|warn|info|debug/i, 'log level') do |v|
         option[:log_level] = v
     end
+    op.on('-o PATH', '--output', 'output file path for digests') do |v|
+        option[:output] = v
+    end
     op.on('-v', '--verbose', 'print progress') do |v|
         option[:verbose] = v
     end
@@ -30,6 +33,17 @@ logger = Logger.new(option[:log_file])
 logger.level = option[:log_level]
 
 logger.info(%(The script started: script="#{$0}, options=#{option}, args=#{ARGV}"))
+headers = []
+ARGV.each do |csv_path|
+    CSV.foreach(csv_path, headers: true) do |row|
+        headers += row.headers
+        break
+    end
+end
+headers = [*headers, 'move_to'].uniq
+logger.debug(%(headers for output file: headers=#{headers}))
+
+io = option[:output].nil? ? IO.open($stdout.fileno, 'wb') : File.open(option[:output], 'wb')
 ARGV.each do |csv_path|
     CSV.foreach(csv_path, converters: :all, headers: true) do |row|
         src_path = row['path']
@@ -48,24 +62,27 @@ ARGV.each do |csv_path|
                 end
             end
         end
-        if File.exist?(dst_path)
-            logger.warn(%(The file already exists: path="#{dst_path}"))
-            next
-        end
+        if !File.exist?(dst_path)
+            dst_dirpath = File.dirname(dst_path)
+            begin
+                unless Dir.exist?(dst_dirpath)
+                    FileUtils.mkdir_p(dst_dirpath)
+                    logger.info(%(create the directory: path="#{dst_dirpath}"))
+                end
 
-        dst_dirpath = File.dirname(dst_path)
-        begin
-            unless Dir.exist?(dst_dirpath)
-                FileUtils.mkdir_p(dst_dirpath)
-                logger.info(%(create the directory: path="#{dst_dirpath}"))
+                FileUtils.move(src_path, dst_path)
+                row['move_to'] = dst_path
+                logger.info(%(moved the file: src="#{src_path}", dst="#{dst_path}"))
+            rescue
+                logger.fatal(%(a fatal error occurred: src_path="#{src_path}", dst_path="#{dst_path}", dst_dirpath="#{dst_dirpath}", message="#{$!}"))
+                raise
             end
-
-            FileUtils.move(src_path, dst_path)
-            logger.info(%(moved the file: src="#{src_path}", dst="#{dst_path}"))
-        rescue
-            logger.fatal(%(a fatal error occurred: src_path="#{src_path}", dst_path="#{dst_path}", dst_dirpath="#{dst_dirpath}", message="#{$!}"))
-            raise
+        else
+            logger.warn(%(The file already exists: path="#{dst_path}"))
+            row['move_to'] = 'n/a'
         end
+        csv_writer << row
     end
 end
+io.close()
 logger.info(%(The script finished))
