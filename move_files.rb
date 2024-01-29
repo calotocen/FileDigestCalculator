@@ -79,7 +79,7 @@ ARGV.each do |csv_path|
             end
         else
             logger.warn(%(The file already exists: path="#{dst_path}"))
-            row['move_to'] = 'n/a'
+            row['move_to'] = f'failed to move the file: dst_path="#{dst_path}", cause="the file already exists"'
         end
         csv_writer << row
     end
