@@ -75,7 +75,7 @@ ARGV.each do |csv_path|
                 logger.info(%(moved the file: src="#{src_path}", dst="#{dst_path}"))
             rescue
                 logger.fatal(%(a fatal error occurred: src_path="#{src_path}", dst_path="#{dst_path}", dst_dirpath="#{dst_dirpath}", message="#{$!}"))
-                raise
+                row['move_to'] = f'failed: message="$!"'
             end
         else
             logger.warn(%(The file already exists: path="#{dst_path}"))
