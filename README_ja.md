@@ -9,3 +9,15 @@
 この仕様は不便ではありますが、利点もあります。
 それは作業内容をステップごとに確認できることです。
 これにより、ディレクトリのマージ時に誤ってデータを削除することを防ぐことができます。
+
+## 使い方
+### ディレクトリの走査
+`list_files.rb`でディレクトリを走査し、ディレクトリに含まれるファイルの情報を取得します。
+ファイル情報は、CSV形式で保存されます。
+
+`list_files.rb`の実行例は、次の通りです。
+この例では、`./directory_a`、`./directory_b`を再帰的に走査し、その結果を`files.csv`に保存します。
+また、ログを`list_files.log`に出力します。
+```
+ruby list_files.rb -r -o files.csv --log-file list_files.log ./directory_a ./directory_b
+```
