@@ -21,3 +21,11 @@
 ```
 ruby list_files.rb -r -o files.csv --log-file list_files.log ./directory_a ./directory_b
 ```
+
+### ファイルリストのフィルタリング
+`filter_file_list.rb`は、ファイルリストをフィルタリングし、操作対象（削除や移動をしたいファイル）を抽出します。
+
+例えば、重複したファイルのうち、リストの最初にあるもの以外をフィルタリングするには、次のようにします。
+```
+ruby filter_file_list.rb -f 'count >= 2' -f 'index > 1' ./list_files.log
+```
