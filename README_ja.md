@@ -15,8 +15,7 @@
 `list_files.rb`でディレクトリを走査し、ディレクトリに含まれるファイルの情報を一覧にしたファイルリストを作成します。
 ファイルリストの形式は、CSV形式です。
 
-`list_files.rb`の実行例は、次の通りです。
-この例では、`./directory_a`、`./directory_b`を再帰的に走査し、その結果を`files.csv`に保存します。
+例えば、次の例は、`./directory_a`、`./directory_b`を再帰的に走査し、その結果を`files.csv`に保存します。
 また、ログを`list_files.log`に出力します。
 ```
 ruby list_files.rb -r -o files.csv --log-file list_files.log ./directory_a ./directory_b
