@@ -24,8 +24,8 @@ ruby list_files.rb -r -o files.csv --log-file list_files.log ./directory_a ./dir
 ### ファイルリストのフィルタリング
 `filter_file_list.rb`は、ファイルリストをフィルタリングし、操作対象（削除や移動をしたいファイル）を抽出します。
 
-例えば、重複したファイルのうち、リストの最初にあるもの以外をフィルタリングするには、次のようにします。
+例えば、次の例は、重複したファイルのうち、リストの最初にあるもの以外をフィルタリングし、その結果を`filtered_files`に保存します。
 また、ログを`filter_file_list.log`に出力します。
 ```
-ruby filter_file_list.rb -f 'count >= 2' -f 'index > 1' ./filter_file_list.log
+ruby filter_file_list.rb -f 'count >= 2' -f 'index > 1' -o filtered_files.csv ./filter_file_list.log
 ```
