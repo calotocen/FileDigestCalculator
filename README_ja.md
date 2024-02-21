@@ -29,3 +29,11 @@ ruby list_files.rb -r -o files.csv --log-file list_files.log ./directory_a ./dir
 ```
 ruby filter_file_list.rb -f 'count >= 2' -f 'index > 1' -o filtered_files.csv --log-file filter_file_list.log files.csv
 ```
+
+### ファイルの削除
+ファイルリストに存在するファイルを全て削除します。
+
+例えば、次の例は、ファイルリスト`files.csv`にリストされる全てのファイルを削除し、その結果を`deleted_files.csv`に保存します。
+```
+ruby delete_files.rb -o deleted_files.csv --log-file delete_files.log files.csv
+```
