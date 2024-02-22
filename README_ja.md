@@ -37,3 +37,15 @@ ruby filter_file_list.rb -f 'count >= 2' -f 'index > 1' -o filtered_files.csv --
 ```
 ruby delete_files.rb -o deleted_files.csv --log-file delete_files.log files.csv
 ```
+
+### ファイルの移動
+ファイルリストに存在するファイルを指定のパスへ全て移動します。
+
+-dオプションで、移動先パスを指定することができます。
+移動先パスには、パラメータを埋め込むことができます。
+例えば、`./{modified_time}/{file_name}`と指定した場合、modified_timeを表すディレクトリを作成後、そのディレクトリへファイルを移動します。
+
+例えば、次の例は、ファイルリスト`files.csv`にリストされる全てのファイルを`./move`ディレクトリへ移動し、その結果を`moved_files.csv`に保存します。
+```
+ruby move_files.rb -o moved_files.csv --log-file move_files.log -d "./move/{file_name}" files.csv
+```
