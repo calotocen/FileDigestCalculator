@@ -5,7 +5,7 @@ class FilterParser < Parslet::Parser
     rule(:space)               { match('\s').repeat(1) }
     rule(:space?)              { space.maybe }
     rule(:identifier)          { (match('[A-Za-z]') >> match('[_0-9A-Za-z]').repeat(0)).as(:identifier) >> space? }
-    rule(:integer)             { (str('0') | match('[1-9]') >> match('[0-9]').repeat(0)).as(:integer) >> space? }
+    rule(:integer)             { (str('-').maybe >> (str('0') | match('[1-9]') >> match('[0-9]').repeat(0))).as(:integer) >> space? }
     rule(:single_quote_string) { str("'") >> (str('\\').ignore >> match("[\\\\']") | str("'").absent? >> any).repeat.as(:single_quote_string) >> str("'") >> space? }
     rule(:double_quote_string) { str('"') >> (str('\\').ignore >> match('[\\\\"]') | str('"').absent? >> any).repeat.as(:double_quote_string) >> str('"') >> space? }
     rule(:regular_expression)  { str('/') >> (str('\\') >> any | str('/').absent? >> any).repeat.as(:regular_expression) >> str('/') >> space?  }
