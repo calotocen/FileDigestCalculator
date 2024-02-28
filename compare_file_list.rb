@@ -40,16 +40,14 @@ right_only_rows = comparable_rows_list[1] - comparable_rows_list[0]
 right_only_rows.each {|comparable_row| rows_list[1][comparable_row.index]['comparison_result'] = 'Only right'}
 
 headers = []
-headers << rows_list[0][0].headers unless rows_list[0].empty?
-headers << rows_list[1][0].headers unless rows_list[0].empty?
+headers += rows_list[0][0].headers unless rows_list[0].empty?
+headers += rows_list[1][0].headers unless rows_list[0].empty?
 headers = headers.uniq
 
-csv_options = {
-    write_headers: true,
-    headers: headers,
-}
-csv_writer = option[:output].nil? ? CSV.new($stdout, **csv_options) : CSV.open(option[:output], 'wb', **csv_options)
-rows_list.flatten(1).each do |row|
-    csv_writer << row
+io = option[:output].nil? ? IO.open($stdout.fileno, 'wb') : File.open(option[:output], 'wb')
+CSV.instance(io, write_headers: true, headers: headers) do |csv_writer|
+    rows_list.flatten(1).each do |row|
+        csv_writer << row
+    end
 end
-csv_writer.close unless option[:output].nil?
+io.close()
