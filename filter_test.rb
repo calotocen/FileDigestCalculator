@@ -21,6 +21,25 @@ class FilterTest < Minitest::Test
         actual_rows = filter.call(rows)
         assert_equal(expected_rows, actual_rows)
     end
+
+    def test_case_of_special_column
+        rows = CSV::Table.new(CSV.new(<<~'EOS', headers: true, converters: :all).to_a).each.to_a
+            id
+            0
+            1
+            2
+        EOS
+
+        expected_rows = [0, 1, 2].map{ |index| rows[index] }
+        filter = Filter::generate('count == 3')
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+
+        expected_rows = [1].map{ |index| rows[index] }
+        filter = Filter::generate('index == 1')
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+    end
     
     def test_case_of_filtering_integer
         rows = CSV::Table.new(CSV.new(<<~'EOS', headers: true, converters: :all).to_a).each.to_a
