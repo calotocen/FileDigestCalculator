@@ -88,5 +88,15 @@ class FilterTest < Minitest::Test
         filter = Filter::generate('integer > 1000000')
         actual_rows = filter.call(rows)
         assert_equal(expected_rows, actual_rows)
+
+        expected_rows = [0].map{ |index| rows[index] }
+        filter = Filter::generate('integer == min(integer)')
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+
+        expected_rows = [7].map{ |index| rows[index] }
+        filter = Filter::generate('integer == max(integer)')
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
     end
 end
