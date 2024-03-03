@@ -99,4 +99,38 @@ class FilterTest < Minitest::Test
         actual_rows = filter.call(rows)
         assert_equal(expected_rows, actual_rows)
     end
+
+    def test_case_of_filtering_text
+        rows = CSV::Table.new(CSV.new(<<~'EOS', headers: true, converters: :all).to_a).each.to_a
+            index,text
+            0,aaa\'
+            1,"bbbb\"""
+            2,cc
+            3,ddddd
+            4,e
+            5,fff
+            6,gggaaaa
+            7,hhhh
+        EOS
+
+        expected_rows = [0].map{ |index| rows[index] }
+        filter = Filter::generate(%(text == 'aaa\\\\\\''))
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+
+        expected_rows = [0, 2, 3, 4, 5, 6, 7].map{ |index| rows[index] }
+        filter = Filter::generate(%(text != "bbbb\\\\\\""))
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+
+        expected_rows = [0, 2, 5, 6].map{ |index| rows[index] }
+        filter = Filter::generate(%(text =~ /^[acfg]/))
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+
+        expected_rows = [0, 1, 3, 4, 7].map{ |index| rows[index] }
+        filter = Filter::generate(%(text !~ /[acfg]$/))
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+    end
 end
