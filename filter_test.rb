@@ -133,4 +133,32 @@ class FilterTest < Minitest::Test
         actual_rows = filter.call(rows)
         assert_equal(expected_rows, actual_rows)
     end
+
+    def test_case_of_filtering_datetime
+        rows = CSV::Table.new(CSV.new(<<~'EOS', headers: true, converters: :all).to_a).each.to_a
+            index,time
+            0,2024-01-01 00:00:00
+            1,2024-02-02
+            2,2024-02-02 01:01:01
+            3,2024-04-04 04:04:04
+            4,2024-04-04 04:04:05
+            5,2025-05-05 05:05:05
+            6,2026-06-06 06:06:06
+        EOS
+
+        expected_rows = [0].map{ |index| rows[index] }
+        filter = Filter::generate("time == datetime('2024-01-01 00:00:00')")
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+
+        expected_rows = [0, 1].map{ |index| rows[index] }
+        filter = Filter::generate("time <= datetime('2024-02-02')")
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+
+        expected_rows = [4, 5, 6].map{ |index| rows[index] }
+        filter = Filter::generate("time > datetime('2024-04-04 04:04:04')")
+        actual_rows = filter.call(rows)
+        assert_equal(expected_rows, actual_rows)
+    end
 end
