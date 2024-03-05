@@ -1,6 +1,6 @@
 require 'csv'
 require 'minitest/autorun'
-require './filter.rb'
+require_relative 'filter.rb'
 
 class FilterTest < Minitest::Test
     def test_case_of_specifying_only_column_name
