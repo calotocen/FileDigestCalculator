@@ -1,6 +1,7 @@
 require 'csv'
 require 'json'
 require 'optparse'
+require_relative 'filter.rb'
 
 option = {
     group_by: [],
@@ -28,67 +29,14 @@ option_parser = OptionParser.new do |op|
 end
 option_parser.parse!(ARGV)
 
-mappers = []
-option[:filter].map do |filter|
-    mapper_factories = {
-        'count' => ->(name, operator, value) {
-            # the operator must be reversed to swap the left and right operands.
-            method = value.to_i.method(operator.tr('<>', '><').intern)
-            ->(rows) {method[rows.length] ? rows : []}
-        },
-        'index' => ->(name, operator, value) {
-            # the operator must be reversed to swap the left and right operands.
-            method = value.to_i.method(operator.tr('<>', '><').intern)
-            ->(rows) {
-                index = -1
-                rows.filter {method[index += 1]}
-            }
-        },
-        'path' => ->(name, operator, value) {
-            # the operator must be reversed to swap the left and right operands.
-            method = eval(value).method(operator.tr('<>', '><').intern)
-            ->(rows) {rows.filter {|row| method[row[name]]}}
-        },
-        'created_time' => ->(name, operator, value) {
-            if /^(?<method_name>min|max)\((?<parameters>[[:print:]]+)\)$/ =~ value
-                ->(rows) {
-                    return [] if rows.empty?
-                    # the operator must be reversed to swap the left and right operands.
-                    method = rows.map{|row| row[parameters]}.method(method_name)[].method(operator.tr('<>', '><').intern)
-                    rows.filter {|row| method[row[name]]}
-                }
-            else
-                ->(rows) {
-                    # the operator must be reversed to swap the left and right operands.
-                    method = DateTime.parse(value).method(operator.tr('<>', '><').intern)
-                    rows.filter {|row| method[row[name]]}
-                }
-            end
-        },
-        'modified_time' => ->(name, operator, value) {
-            return mapper_factories['created_time'][name, operator, value]
-        },
-        'access_time' => ->(name, operator, value) {
-            return mapper_factories['created_time'][name, operator, value]
-        },
-        'change_time' => ->(name, operator, value) {
-            return mapper_factories['created_time'][name, operator, value]
-        },
-    }
-    # Ruby cannot assign matched strings to local variables by (?<>) when patterns contain expression expansion by #{}.
-    unless m = /^(#{mapper_factories.keys.join('|')})\s*(?:(==|!=|<=?|>=?|=~|!~)\s*(.*))?$/.match(filter)
-        raise ArgumentError.new("wrong filter: filter='#{filter}'")
-    end
-    mappers << mapper_factories[m[1]][m[1], m[2], m[3]]
-end
-
+filters = option[:filter].map {|filter| Filter::generate(filter)}
 input_rows = ARGV
     .map {|csv_path| CSV.open(csv_path, converters: :all, headers: true).to_a}
     .flatten(1)
 filtered_rows = CSV::Table.new(input_rows)
     .group_by {|row| option[:group_by].map {|column_name| row[column_name]}}
     .values
-    .map {|rows| mappers.inject(rows) {|mapped_rows, mapper| mapper[mapped_rows]}}
+    .map {|rows| filters.inject(rows) {|filtered_rows, filter| filter.call(filtered_rows)}}
     .flatten(1)
 unless option[:sort_by].empty?
     sequential_number_for_stable_sort = 0
