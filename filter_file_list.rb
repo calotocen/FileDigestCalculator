@@ -52,6 +52,6 @@ unless option[:column].empty?
     end
 end
 
-writer = option[:output].nil? ? $stdout : File.open(option[:output], 'w')
+writer = option[:output].nil? ? IO.open($stdout.fileno, 'wb') : File.open(option[:output], 'w')
 writer << CSV::Table.new(filtered_rows).to_csv
-writer.close unless option[:output].nil?
+writer.close
